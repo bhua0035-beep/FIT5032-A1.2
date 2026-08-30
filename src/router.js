@@ -3,6 +3,7 @@ import Home from './views/Home.vue'
 import Calendar from './views/Calendar.vue'
 import Resources from './views/Resources.vue'
 import Auth from './views/Auth.vue'
+import { isAuthenticated } from './store.js'
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -16,4 +17,14 @@ const router = createRouter({
   routes
 })
 
+router.beforeEach((to, from, next) => {
+  // Protect the Resources page
+  if (to.name === 'Resources' && !isAuthenticated.value) {
+    next({ name: 'Auth' });
+  } else {
+    next();
+  }
+})
+
 export default router
+

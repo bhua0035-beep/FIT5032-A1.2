@@ -4,9 +4,12 @@
       <div class="col-md-6 offset-md-3">
         <div class="card shadow">
           <div class="card-header bg-success text-white">
-            <h3 class="card-title mb-0">Join the EcoYouth Community</h3>
+            <h3 class="card-title mb-0">Login or Register</h3>
           </div>
           <div class="card-body">
+            <div class="alert alert-info mb-4">
+              <strong>Demo Login:</strong> Any valid details will "log you in" to see the Resources page.
+            </div>
             <form @submit.prevent="submitForm">
               
               <!-- Username Field -->
@@ -59,12 +62,12 @@
 
               <!-- Submit Button -->
               <div class="text-center">
-                <button type="submit" class="btn btn-success w-100 mb-2">Register</button>
+                <button type="submit" class="btn btn-success w-100 mb-2">Login / Register</button>
                 <button type="button" class="btn btn-secondary w-100" @click="clearForm">Clear</button>
               </div>
 
               <div v-if="submittedSuccess" class="alert alert-success mt-3" role="alert">
-                Registration successful! Welcome to EcoYouth.
+                Success! Redirecting...
               </div>
 
             </form>
@@ -77,6 +80,10 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { isAuthenticated } from '../store.js';
+
+const router = useRouter();
 
 const formData = ref({
   username: '',
@@ -128,7 +135,10 @@ const submitForm = () => {
 
   if (!errors.value.username && !errors.value.email && !errors.value.password) {
     submittedSuccess.value = true;
-    console.log("Form Submitted:", formData.value);
+    isAuthenticated.value = true; // Log user in
+    setTimeout(() => {
+      router.push('/resources');
+    }, 500);
   } else {
     submittedSuccess.value = false;
   }
@@ -148,4 +158,3 @@ const clearForm = () => {
   submittedSuccess.value = false;
 };
 </script>
-

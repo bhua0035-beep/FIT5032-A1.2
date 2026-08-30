@@ -1,9 +1,112 @@
 <template>
-  <div class="container mt-5 text-center">
-    <h2>Resources Library Placeholder</h2>
-    <p class="lead">Here we will dynamically load resources from Local Storage.</p>
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-12 text-center mb-4">
+        <h2>Eco-Anxiety Resources Library</h2>
+        <p class="lead">Find coping strategies and share your own helpful links.</p>
+      </div>
+    </div>
+
+    <!-- Form to Add New Resource -->
+    <div class="row mb-5">
+      <div class="col-md-8 offset-md-2">
+        <div class="card shadow-sm">
+          <div class="card-header bg-light">
+            <strong>Share a Resource</strong>
+          </div>
+          <div class="card-body">
+            <form @submit.prevent="addResource">
+              <div class="row g-3 align-items-center">
+                <div class="col-sm-5">
+                  <input type="text" class="form-control" v-model="newResource.title" placeholder="Resource Title" required>
+                </div>
+                <div class="col-sm-5">
+                  <input type="text" class="form-control" v-model="newResource.type" placeholder="Type (e.g. Article, Video)" required>
+                </div>
+                <div class="col-sm-2">
+                  <button type="submit" class="btn btn-success w-100">Add</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dynamic List of Resources Using PrimeVue DataTable -->
+    <div class="row">
+      <div class="col-md-10 offset-md-1">
+        <DataTable :value="resourcesList" responsiveLayout="scroll" class="shadow-sm">
+          <Column field="title" header="Resource Title"></Column>
+          <Column field="type" header="Resource Type"></Column>
+          <Column header="Actions">
+            <template #body="slotProps">
+              <button class="btn btn-sm btn-outline-danger" @click="removeResource(slotProps.index)">Remove</button>
+            </template>
+          </Column>
+          <template #empty>
+            <div class="text-center p-3">No resources added yet. Be the first to share one!</div>
+          </template>
+        </DataTable>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
+import { ref, onMounted, watch } from 'vue';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+
+// Default starter data
+const initialResources = [
+  { title: '10 Ways to Cope with Eco-Anxiety', type: 'Article' },
+  { title: 'Guided Meditation for Climate Stress', type: 'Audio' },
+  { title: 'Local Tree Planting Groups', type: 'Community Link' }
+];
+
+// Reactive state for the list
+const resourcesList = ref([]);
+
+// Reactive state for the new form
+const newResource = ref({
+  title: '',
+  type: ''
+});
+
+// Load from LocalStorage on mount
+onMounted(() => {
+  const savedResources = localStorage.getItem('ecoYouthResources');
+  if (savedResources) {
+    resourcesList.value = JSON.parse(savedResources);
+  } else {
+    // Populate with defaults if empty
+    resourcesList.value = [...initialResources];
+  }
+});
+
+// Watch for changes and save to LocalStorage automatically
+watch(resourcesList, (newVal) => {
+  localStorage.setItem('ecoYouthResources', JSON.stringify(newVal));
+}, { deep: true });
+
+// Function to add a resource
+const addResource = () => {
+  if (newResource.value.title && newResource.value.type) {
+    resourcesList.value.push({
+      title: newResource.value.title,
+      type: newResource.value.type
+    });
+    // Clear the form
+    newResource.value.title = '';
+    newResource.value.type = '';
+  }
+};
+
+// Function to remove a resource
+const removeResource = (index) => {
+  resourcesList.value.splice(index, 1);
+};
 </script>
+
+
