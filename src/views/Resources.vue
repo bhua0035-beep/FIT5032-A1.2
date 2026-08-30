@@ -33,21 +33,28 @@
       </div>
     </div>
 
-    <!-- Dynamic List of Resources Using PrimeVue DataTable -->
+    <!-- Dynamic List of Resources using v-for -->
     <div class="row">
       <div class="col-md-10 offset-md-1">
-        <DataTable :value="resourcesList" responsiveLayout="scroll" class="shadow-sm">
-          <Column field="title" header="Resource Title"></Column>
-          <Column field="type" header="Resource Type"></Column>
-          <Column header="Actions">
-            <template #body="slotProps">
-              <button class="btn btn-sm btn-outline-danger" @click="removeResource(slotProps.index)">Remove</button>
-            </template>
-          </Column>
-          <template #empty>
-            <div class="text-center p-3">No resources added yet. Be the first to share one!</div>
-          </template>
-        </DataTable>
+        <table class="table table-striped table-bordered shadow-sm">
+          <thead class="table-success">
+            <tr>
+              <th>Resource Title</th>
+              <th>Resource Type</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(resource, index) in resourcesList" :key="index">
+              <td>{{ resource.title }}</td>
+              <td>{{ resource.type }}</td>
+              <td><button class="btn btn-sm btn-outline-danger" @click="removeResource(index)">Remove</button></td>
+            </tr>
+            <tr v-if="resourcesList.length === 0">
+              <td colspan="3" class="text-center text-muted">No resources added yet. Be the first to share one!</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -55,8 +62,7 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
+
 
 // Default starter data
 const initialResources = [
